@@ -3,6 +3,7 @@
 # control fan based on temperature limit
 #
 # EZFan2 connected to standard RPi case fan
+#   https://www.tindie.com/products/jeremycook/ez-fan2-tiny-raspberry-pi-fan-controller/
 #
 #               +--------+
 # +-----+       |        +----5V
