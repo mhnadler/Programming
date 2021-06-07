@@ -3,7 +3,6 @@
 # control fan based on temperature limit
 #
 # EZFan2 connected to standard RPi case fan
-#   https://www.tindie.com/products/jeremycook/ez-fan2-tiny-raspberry-pi-fan-controller/
 #
 #               +--------+
 # +-----+       |        +----5V
@@ -45,20 +44,28 @@ from vcgencmd import Vcgencmd
 vcgm = Vcgencmd()
 cputemp = vcgm.measure_temp()
 if verbose:
-    print("cpu temp: %2.1f, limit: %2.1f" % (cputemp, temp_limit))
+    import datetime
+    now = datetime.datetime.now()
+    print("%s cpu temp: %2.1f, limit: %2.1f" % (str(now), cputemp, temp_limit))
 
 #use GPIO pin numbering not physical
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 GPIO.setup(pin, GPIO.OUT)
+fanstate = GPIO.input(pin)
 
 if cputemp > temp_limit:
-    GPIO.output(pin, GPIO.HIGH)
-    if verbose:
-        print("turn on fan via pin: %d" % pin)
+    if fanstate == 0:
+        GPIO.output(pin, GPIO.HIGH)
+        if verbose:
+            print("turn on fan via pin: %d" % pin)
+elif cputemp < (temp_limit - 5.0):
+    if fanstate == 1:
+        if verbose:
+            print("turn off fan via pin: %d" % pin)
+        GPIO.output(pin, GPIO.LOW)
 else:
     if verbose:
-        print("turn off fan via pin: %d" % pin)
-    GPIO.output(pin, GPIO.LOW)
+        print("leave fan on for a bit more cooling")
 
